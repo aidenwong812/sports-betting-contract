@@ -11,7 +11,7 @@ contract Betting {
   IERC20 public paymentToken;
 
   // Contract owner
-  address owner;
+  address public owner;
 
   enum BetOption {
     HOME,
@@ -54,14 +54,14 @@ contract Betting {
   /// @param _figureId: the ID of the fixture
   /// @param _option: the result of the fixture that the user wants to bet on
   /// @param _betAmount: the amount of the user's bet
-  function placeBet(uint _figureId, BetOption _option, uint8 _odd, uint _betAmount) public payable {
+  function placeBet(uint _figureId, BetOption _option, uint8 _odd, uint _betAmount) public {
     paymentToken.transferFrom(msg.sender, address(this), _betAmount);
     bets[_figureId].push(
       Bet({ user: msg.sender, option: _option, odd: _odd, betAmount: _betAmount })
     );
   }
 
-  function processGame(uint _figureId, BetOption _result) public {
+  function processGame(uint _figureId, BetOption _result) public onlyOwner {
     Bet[] memory betters = bets[_figureId];
     for (uint i = 0; i < betters.length; i++) {
       Bet memory better = betters[i];
